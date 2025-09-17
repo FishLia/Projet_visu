@@ -22,4 +22,11 @@ colnames(data)
 
 data_cut <- data %>% select(NOM_USUEL, LAT, LON, ALTI, AAAAMM, RR, TMM, FFM, INST, GLOT)
 head(data_cut)
-data_cut %>% 
+
+### TO DO : 
+## check which lines have only NAs and throw them
+## decide on a proportion of na to yeet now that i only have the data i want (do not count the first 5 columns, only last 5 are variables)
+## make script to count shit and clean everything based on chosen columns and na proportions
+## run it
+## write new datasets
+## send them to the drive
