@@ -1,0 +1,25 @@
+setwd("C:/Users/emili/Desktop/Better_meteo_data/data_csv")
+
+library(ggplot2)
+library(tidyverse)
+library(flextable)
+library(patchwork)
+library(RColorBrewer)
+library(viridis)
+library(dplyr)
+library(lubridate)
+library(stringr)
+
+library(zoo)
+
+dir()
+dir()[1]
+
+data <- data.table::fread(dir()[2])
+data$AAAAMM <- data$AAAAMM %>% as.character() %>% as.yearmon(data$AAAAMM, format = "%Y%m")
+
+colnames(data)
+
+data_cut <- data %>% select(NOM_USUEL, LAT, LON, ALTI, AAAAMM, RR, TMM, FFM, INST, GLOT)
+head(data_cut)
+data_cut %>% 
