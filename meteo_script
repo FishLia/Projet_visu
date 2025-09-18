@@ -1,4 +1,5 @@
 setwd("C:/Users/emili/Desktop/Better_meteo_data/data_csv")
+setwd("C:/Users/José/Desktop/better_meteo_data/better_data")
 
 library(ggplot2)
 library(tidyverse)
@@ -9,24 +10,65 @@ library(viridis)
 library(dplyr)
 library(lubridate)
 library(stringr)
-
 library(zoo)
 
 dir()
-dir()[1]
+files <- list.files(pattern = "\\.csv$")
 
-data <- data.table::fread(dir()[2])
-data$AAAAMM <- data$AAAAMM %>% as.character() %>% as.yearmon(data$AAAAMM, format = "%Y%m")
+for (f in files) {
+  message("Processing: ", f)
+  
+  data <- data.table::fread(f)
+  
+  data$AAAAMM <- as.yearmon(as.character(data$AAAAMM), format = "%Y%m")
+  data$year <- year(data$AAAAMMJJ)
+  data$month <- month(data$AAAAMMJJ)
+  
+  data_cut <- data %>% select(NOM_USUEL, LAT, LON, ALTI, AAAAMM, RR, TM, TX)
 
-colnames(data)
+  
+  data_cut$file <- f
 
-data_cut <- data %>% select(NOM_USUEL, LAT, LON, ALTI, AAAAMM, RR, TMM, FFM, INST, GLOT)
-head(data_cut)
+  write_csv(data_cut, "data_csv/all_na_years.csv") ## figure out the folders and paste shit
+  
+  rm(data, data_cut)
+  gc()
+}
 
-### TO DO : 
-## check which lines have only NAs and throw them
-## decide on a proportion of na to yeet now that i only have the data i want (do not count the first 5 columns, only last 5 are variables)
-## make script to count shit and clean everything based on chosen columns and na proportions
-## run it
-## write new datasets
-## send them to the drive
+
+
+### Next loop is to delete cols with 70%+ na and rows with 60%+ na, but as i said in the other script,
+### i think even with fuckass na, we can still make graphs and all bc 90% missing data still leaves
+### like 3k data to work with, thats already good amount for a graph and shit.
+### so i keep it for now, but we'll see what we do with it
+for (f in files) {
+    message("Processing: ", f)
+
+    data <- data.table::fread(f)
+  
+    # Checking nas per row :
+    na_summary_rows <- data %>% mutate(
+        na_row = rowSums(is.na(data)),               
+        tot_row = ncol(data),
+        na_prop = na_row / tot_row * 100 
+        )
+
+    # Filter rows with >60% na
+    na_summary_rows %>% filter(na_prop > 60)
+
+    ## add deletion code
+
+    # Getting na proportion per column :
+    na_summary <- data %>%
+    summarise(across(everything(), ~ mean(is.na(.)))) %>%
+    pivot_longer(everything(), names_to = "column", values_to = "na_prop") %>%
+    mutate(na_prop = na_prop * 100)
+
+    # Filter columns with >70% na
+    na_summary %>% filter(na_prop > 70)
+
+    ## add deletion code
+
+    ### add writing file code
+    ### add cleanup code
+}
