@@ -1,0 +1,142 @@
+setwd("C:/Users/emili/Desktop/Better_meteo_data/data_csv")
+setwd("C:/Users/José/Desktop/better_meteo_data/better_data")
+
+library(ggplot2)
+library(tidyverse)
+library(flextable)
+library(patchwork)
+library(RColorBrewer)
+library(viridis)
+library(dplyr)
+library(lubridate)
+library(stringr)
+library(zoo)
+
+dir()
+dir()[1]
+
+data <- data.table::fread(dir()[1])
+data$AAAAMM <- data$AAAAMM %>% as.character() %>% as.yearmon(data$AAAAMM, format = "%Y%m")
+
+colnames(data)
+
+# New data :
+data_cut <- data %>% select(NOM_USUEL, LAT, LON, ALTI, AAAAMM, RR, TMM, FFM, INST, GLOT)
+head(data_cut)
+
+### TO DO : 
+## check which lines have only NAs and throw them
+## decide on a proportion of na to yeet now that i only have the data i want (do not count the first 5 columns, only last 5 are variables)
+## make script to count shit and clean everything based on chosen columns and na proportions
+## run it
+## write new datasets
+## send them to the drive
+
+# Checking nas :
+na_summary_rows <- data_cut %>% mutate(
+      na_row = rowSums(is.na(data_cut)),               
+      tot_row = ncol(data_cut),
+      na_prop = na_row / tot_row * 100 
+    )
+summary(na_summary_rows$na_prop)
+
+# Checking columns :
+colSums(is.na(data_cut))
+nrow(data_cut)
+
+# Getting na proportion per column :
+na_summary <- data_cut %>%
+  summarise(across(everything(), ~ mean(is.na(.)))) %>%
+  pivot_longer(everything(), names_to = "column", values_to = "na_prop") %>%
+  mutate(na_prop = na_prop * 100)
+
+# Filter columns with >30% na
+na_summary %>% filter(na_prop > 30)
+#1 TMM       88.9
+#2 FFM       91.8
+#3 INST      95.5
+#4 GLOT      97.3
+## so pb bc we dont even have estimates of these, but we could try with TX or TX_ME
+### moyenne mensuelle des températures maximales (TX) quotidiennes (en °C et 1/10) (TX_ME is estimated TX)
+## INST and GLOT are insulation, we could check with -> NBSIGMA80 : nombre de jours avec SIGMA ≥ 80%
+
+### Checking :
+
+# New data :
+data_cut_2 <- data %>% select(NOM_USUEL, LAT, LON, ALTI, AAAAMM, RR, TX, TX_ME, TM, NBSIGMA80)
+head(data_cut_2)
+
+# Checking nas :
+na_summary_rows_2 <- data_cut_2 %>% mutate(
+      na_row = rowSums(is.na(data_cut_2)),               
+      tot_row = ncol(data_cut_2),
+      na_prop = na_row / tot_row * 100 
+    )
+summary(na_summary_rows_2$na_prop)
+
+# Checking columns :
+colSums(is.na(data_cut_2))
+nrow(data_cut_2)
+
+# Getting na proportion per column :
+na_summary_2 <- data_cut_2 %>%
+  summarise(across(everything(), ~ mean(is.na(.)))) %>%
+  pivot_longer(everything(), names_to = "column", values_to = "na_prop") %>%
+  mutate(na_prop = na_prop * 100)
+# Filter columns with >30% na
+na_summary_2 %>% filter(na_prop > 30)
+#1 TX           57.2
+#2 TX_ME       100.
+#3 TM           57.3
+#4 NBSIGMA80    95.5
+
+## so TX_ME is out, full of NA, TX is bad but ok-ish, TM same, NBSIGMA80 is out too.
+## i propose we keep TM for temperature, RR for rain, and all the rest. Yeah... the wind.... i mean
+## we can try bc we still got 31963 rows so at some point bc 90% os 31963 is still 3196.3 thats still a lot of shit
+## so like, depends on if u think thats enough? for some graphs to check i think its ok, but well have 
+## to warn and keep in mind that its a v smol bit of entire dataset
+
+### checking rows real quick.....
+
+na_summary_rows %>% filter(na_prop > 40) %>% nrow()
+na_summary_rows_2 %>% filter(na_prop > 40) %>% nrow()
+
+### MAKING BETTER DATASET
+
+# New data :
+data_cut_3 <- data %>% select(NOM_USUEL, LAT, LON, ALTI, AAAAMM, RR, TM, TX)
+head(data_cut_3)
+
+# Checking nas :
+na_summary_rows_3 <- data_cut_3 %>% mutate(
+      na_row = rowSums(is.na(data_cut_3)),               
+      tot_row = ncol(data_cut_3),
+      na_prop = na_row / tot_row * 100 
+    )
+summary(na_summary_rows_3$na_prop)
+
+# Checking columns :
+colSums(is.na(data_cut_3))
+nrow(data_cut_3)
+
+# Getting na proportion per column :
+na_summary_3 <- data_cut_3 %>%
+  summarise(across(everything(), ~ mean(is.na(.)))) %>%
+  pivot_longer(everything(), names_to = "column", values_to = "na_prop") %>%
+  mutate(na_prop = na_prop * 100)
+
+# Filter columns with >30% na :
+na_summary_3 %>% filter(na_prop > 30)
+#1 TM        57.3
+#2 TX        57.2
+# Count NA per row :
+na_summary_rows_3 %>% filter(na_prop > 30) %>% nrow()
+# [1] 0 fuck YES
+# >30% is [1] 322 tho... still good tho, thats like idk 1-ish% its ok i think
+
+## i think we can keep all the rows in this dataset tbh, we have a lot less variables to play with tho....
+## i think rows with 60%+ na will be yeet, columns with 70+ na will be yeet
+## the rest we keep, so not all tables will be same length, but we can trim this after too i think
+## let's concentrate on the 1950-2023 rn, ill check the other tables laterrr
+
+### ill make a new script for the loops i think, this is already cluttered enough
