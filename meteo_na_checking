@@ -140,3 +140,38 @@ na_summary_rows_3 %>% filter(na_prop > 30) %>% nrow()
 ## let's concentrate on the 1950-2023 rn, ill check the other tables laterrr
 
 ### ill make a new script for the loops i think, this is already cluttered enough
+
+### shit to add -> RRAB, PMERM, UNAB, UXAB, UMM, NBJNEIG, NBJGREL, NBJORAG, NBJBROU
+
+
+
+### MAKING A BIGGER DATASET
+
+# New data :
+data_cut_4 <- data %>% select(NOM_USUEL, LAT, LON, ALTI, AAAAMM, RR, TM, TX, RRAB, PMERM, UNAB, UXAB, UMM, NBJNEIG, NBJGREL, NBJORAG, NBJBROU)
+head(data_cut_4)
+
+# Checking nas :
+na_summary_rows_4 <- data_cut_4 %>% mutate(
+      na_row = rowSums(is.na(data_cut_4)),               
+      tot_row = ncol(data_cut_4),
+      na_prop = na_row / tot_row * 100 
+    )
+summary(na_summary_rows_4$na_prop)
+
+# Checking columns :
+colSums(is.na(data_cut_4))
+nrow(data_cut_4)
+
+# Getting na proportion per column :
+na_summary_4 <- data_cut_4 %>%
+  summarise(across(everything(), ~ mean(is.na(.)))) %>%
+  pivot_longer(everything(), names_to = "column", values_to = "na_prop") %>%
+  mutate(na_prop = na_prop * 100)
+
+# Filter columns with >50% na :
+na_summary_4 %>% filter(na_prop > 50)
+
+# Count NA per row :
+na_summary_rows_4 %>% filter(na_prop > 30) %>% nrow()
+nrow(data_cut_4)
