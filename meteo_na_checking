@@ -11,6 +11,8 @@ library(dplyr)
 library(lubridate)
 library(stringr)
 library(zoo)
+library(VIM)
+library(naniar)
 
 dir()
 dir()[1]
@@ -148,8 +150,9 @@ na_summary_rows_3 %>% filter(na_prop > 30) %>% nrow()
 ### MAKING A BIGGER DATASET
 
 # New data :
-data_cut_4 <- data %>% select(NOM_USUEL, LAT, LON, ALTI, AAAAMM, RR, TM, TX, RRAB, PMERM, UNAB, UXAB, UMM, NBJNEIG, NBJGREL, NBJORAG, NBJBROU)
+data_cut_4 <- data %>% select(NOM_USUEL, LAT, LON, ALTI, AAAAMM, RR, TM, TX, RRAB, NBJNEIG, NBJGREL, NBJORAG, NBJBROU)
 head(data_cut_4)
+### Testing real quick without PMERM, UNAB, UXAB, UMM, 
 
 # Checking nas :
 na_summary_rows_4 <- data_cut_4 %>% mutate(
@@ -175,3 +178,6 @@ na_summary_4 %>% filter(na_prop > 50)
 # Count NA per row :
 na_summary_rows_4 %>% filter(na_prop > 30) %>% nrow()
 nrow(data_cut_4)
+
+aggr(data_cut_4, col = c("skyblue","orange"),
+numbers=TRUE, sortVars=TRUE, cex.axis=.7,)
