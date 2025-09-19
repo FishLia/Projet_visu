@@ -17,26 +17,54 @@ files <- list.files(pattern = "\\.csv$")
 
 for (f in files) {
   message("Processing: ", f)
-  
-  data <- data.table::fread(f)
-  
-  data$AAAAMM <- as.yearmon(as.character(data$AAAAMM), format = "%Y%m")
-  data$year <- year(data$AAAAMMJJ)
-  data$month <- month(data$AAAAMMJJ)
-  
-  data_cut <- data %>% select(NOM_USUEL, LAT, LON, ALTI, AAAAMM, RR, TM, TX)
 
-  
+  data <- data.table::fread(f)
+
+  data$AAAAMM <- as.yearmon(as.character(data$AAAAMM), format = "%Y%m")
+  data$year <- year(data$AAAAMM)
+  data$month <- month(data$AAAAMM)
+
+  data_cut <- data %>% select(NOM_USUEL, LAT, LON, ALTI, AAAAMM,
+                              RR, TM, TX, RRAB, NBJNEIG,
+                              NBJGREL, NBJORAG, NBJBROU)
+
   data_cut$file <- f
 
-  write_csv(data_cut, "data_csv/all_na_years.csv") ## figure out the folders and paste shit
-  
+  out_path <- file.path("C:/Users/emili/Desktop/Better_meteo_data/data_cut", f)
+  write_csv(data_cut, out_path)
+
   rm(data, data_cut)
   gc()
 }
 
 
+files <- list.files("C:/Users/emili/Desktop/Better_meteo_data/data_cut",
+                    full.names = TRUE)
 
+dir.create("C:/Users/emili/Desktop/Better_meteo_data/data_cut/old_files",
+           showWarnings = FALSE)
+dir.create("C:/Users/emili/Desktop/Better_meteo_data/data_cut/recent_files",
+           showWarnings = FALSE)
+dir.create("C:/Users/emili/Desktop/Better_meteo_data/data_cut/very_recent_files",
+           showWarnings = FALSE)
+
+for (f in files) {
+  fname <- basename(f)
+
+  if (str_detect(fname, "1949")) {
+    out_path <- file.path("C:/Users/emili/Desktop/Better_meteo_data/data_cut/old_files", fname)
+    file.rename(f, out_path)
+  } else if (str_detect(fname, "2023")) {
+    out_path <- file.path("C:/Users/emili/Desktop/Better_meteo_data/data_cut/recent_files", fname)
+    file.rename(f, out_path)
+  } else if (str_detect(fname, "2024")) {
+    out_path <- file.path("C:/Users/emili/Desktop/Better_meteo_data/data_cut/very_recent_files", fname)
+    file.rename(f, out_path)
+  }
+}
+
+#### NEXT LOOP IS NOT DONE PLS DONT RUN IT ITS TRASH ####
+# idk if i keep it even?
 ### Next loop is to delete cols with 70%+ na and rows with 60%+ na, but as i said in the other script,
 ### i think even with fuckass na, we can still make graphs and all bc 90% missing data still leaves
 ### like 3k data to work with, thats already good amount for a graph and shit.
