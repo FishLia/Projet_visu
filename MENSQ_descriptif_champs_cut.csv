@@ -1,0 +1,13 @@
+NOM_USUEL       : nom usuel du poste
+LAT             : latitude, négative au sud (en degrés et millionièmes de degré)
+LON             : longitude, négative à l’ouest de GREENWICH (en degrés et millionièmes de degré)
+ALTI            : altitude du pied de l'abri ou du pluviomètre si pas d'abri (en m)
+AAAAMM          : mois
+RR              : cumul mensuel des hauteurs de précipitation (en mm et 1/10)
+RRAB            : précipitation maximale tombée en 24 heures au cours du mois (en mm et 1/10)
+TX              : moyenne mensuelle des températures maximales (TX) quotidiennes (en °C et 1/10)
+TM              : moyenne mensuelle des (TN+TX)/2 quotidiennes (en °C et 1/10)
+NBJNEIG         : nombre de jours avec précipitation de neige
+NBJGREL         : nombre de jours présents avec grêle
+NBJORAG         : nombre de jours présents avec orage
+NBJBROU         : nombre de jours présents avec brouillard
