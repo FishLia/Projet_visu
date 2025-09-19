@@ -179,5 +179,7 @@ na_summary_4 %>% filter(na_prop > 50)
 na_summary_rows_4 %>% filter(na_prop > 30) %>% nrow()
 nrow(data_cut_4)
 
+vis_miss(data_cut_4)
+
 aggr(data_cut_4, col = c("skyblue","orange"),
 numbers=TRUE, sortVars=TRUE, cex.axis=.7,)
