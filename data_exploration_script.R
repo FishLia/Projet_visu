@@ -123,12 +123,18 @@ var_region %>%
 
 ## "mean_RR" "mean_TM" "mean_TX"
 
-plotting_per_region <- function(reg, variable) {
+plotting_per_region <- function(reg) {
   var_region %>%
-    filter(reg == region) %>%
-    ggplot(aes(x = year, y = .data[[variable]]),
-               colour = as.factor(year)) +
+    filter(region == reg) %>%
+    pivot_longer(cols = c(mean_RR, mean_TM, mean_TX),
+                 names_to = "variable",
+                 values_to = "value") %>%
+    ggplot(aes(x = year, y = value, color = variable)) +
     geom_point() +
-    geom_line()
+    geom_line() +
+    labs(x = "Année",
+         y = "Valeur",
+         color = "Variable",
+         title = paste0("Evolution de RR, TM, TX pour la région ", reg))
 }
-plotting_per_region("_01_", "mean_RR")
+plotting_per_region("_01_")
