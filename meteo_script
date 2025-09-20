@@ -24,11 +24,9 @@ for (f in files) {
   data$year <- year(data$AAAAMM)
   data$month <- month(data$AAAAMM)
 
-  data_cut <- data %>% select(NOM_USUEL, LAT, LON, ALTI, AAAAMM,
+  data_cut <- data %>% select(NOM_USUEL, LAT, LON, ALTI, AAAAMM, year, month,
                               RR, TM, TX, RRAB, NBJNEIG,
                               NBJGREL, NBJORAG, NBJBROU)
-
-  data_cut$file <- f
 
   out_path <- file.path("C:/Users/emili/Desktop/Better_meteo_data/data_cut", f)
   write_csv(data_cut, out_path)
