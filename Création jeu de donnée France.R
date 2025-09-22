@@ -6,7 +6,7 @@ library(readr)  # plus sûr que read.table
 library(lubridate)
 
 # Dossier où se trouvent tes fichiers
-data_path <- "C:/Users/augus/OneDrive/Documents/Cours/ACO/M2/Visualisation/Projet/recent_files/"
+data_path <- "C:/Users/augus/OneDrive/Documents/Cours/ACO/M2/Visualisation/Projet/very_recent_files/"
 
 # Liste tous les fichiers CSV qui commencent par "MENS_departement"
 files <- list.files(path = data_path, pattern = "^MENS_departement.*\\.csv$", full.names = TRUE)
@@ -38,3 +38,9 @@ names(dep_list) <- gsub("^.*MENS_departement_|_periode.*$", "", files)
 
 # Option 2 : combiner tous les départements dans un seul data.frame
 dep_all <- bind_rows(dep_list, .id = "departement")
+
+# dep_recent <- dep_all
+# dep_very_recent <- dep_all
+# dep_old <- dep_all
+
+dep_all <- bind_rows(dep_old, dep_recent, dep_very_recent)
