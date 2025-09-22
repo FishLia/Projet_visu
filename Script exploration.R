@@ -1,5 +1,7 @@
 require(tidyverse)
 library(ggcorrplot)
+library(FactoMineR)
+library(Factoshiny)
 
 dep_01_init <- read.table("C:/Users/augus/OneDrive/Documents/Cours/ACO/M2/Visualisation/Projet/recent_files/MENS_departement_01_periode_1950-2023.csv", header = TRUE, sep = ",")
 
@@ -51,5 +53,12 @@ TM_by_year <- dep_01 %>% group_by(year) %>%
 TM_by_year
 
 cor_mat <- cor(dep_01[,-c(3,15)])
-ggcorrplot(cor_mat,lab = T, lab_size = 3)
+plot_corrmat <- ggcorrplot(cor_mat,lab = T, lab_size = 3)
+plot_corrmat
+
+dfcompleted <- missMDA::imputePCA(dep_01, ncp=2,quali.sup=c(3,15))$completeObs
+res.PCA<-PCA(dfcompleted,quali.sup=c(3,15),graph=FALSE)
+plot.PCA(res.PCA,choix='var',title="Graphe des variables de l'ACP")
+plot.PCA(res.PCA,invisible=c('quali','ind.sup'),habillage='year',title="Graphe des individus de l'ACP",label ='none')
+
 
