@@ -1,5 +1,5 @@
 require(tidyverse)
-
+library(ggcorrplot)
 
 dep_01_init <- read.table("C:/Users/augus/OneDrive/Documents/Cours/ACO/M2/Visualisation/Projet/recent_files/MENS_departement_01_periode_1950-2023.csv", header = TRUE, sep = ",")
 
@@ -23,8 +23,33 @@ summary(dep_01)
 dep_01$AAAAMM <- as.Date(as.character(dep_01$AAAAMM), "%b.%Y")
 class(dep_01$AAAAMM)
 
-dep_01 %>% ggplot()+
-  aes(x = AAAAMM, y = )
+dep_01$date <- paste0(dep_01$year, dep_01$month) 
+dep_01$date <- as.Date(paste(dep_01$year, dep_01$month, "01", sep = "-"))
 
 
+RR_by_year <- dep_01 %>% group_by(year) %>% 
+  summarise(moy = mean(RR)) %>% 
+  ggplot()+
+  aes(x = year, y = moy) + 
+  geom_line()
+
+NBJNEIG_by_year <- dep_01 %>% group_by(year) %>% 
+  summarise(NBJNEIG = sum(NBJNEIG)) %>% 
+  ggplot()+
+  aes(x = year, y = NBJNEIG) + 
+  geom_line()
+
+NBJNEIG_by_year
+
+TM_by_year <- dep_01 %>% group_by(year) %>% 
+  summarise(TM_moy = mean(TM)) %>% 
+  ggplot()+
+  aes(x = year, y = TM_moy) + 
+  geom_point()+
+  geom_smooth()
+
+TM_by_year
+
+cor_mat <- cor(dep_01[,-c(3,15)])
+ggcorrplot(cor_mat,lab = T, lab_size = 3)
 
