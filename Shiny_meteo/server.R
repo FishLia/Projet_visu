@@ -1,38 +1,26 @@
+# app.R  ----
 library(shiny)
 
-# Define server logic required to draw a histogram
-shinyServer(function(input, output) {
+function(input, output, session) {
   
-  output$distPlot <- renderPlot({
-    
-    # generate bins based on input$bins from ui.R
-    x    <- faithful[, input$var] 
-    bins <- seq(min(x), max(x), length.out = input$bins + 1)
-    
-    # draw the histogram with the specified number of bins
-    hist(x, breaks = bins, col = input$color, border = 'white', main = input$titre)
-    
+  # 1. Carte
+  output$map_plot <- renderPlot({
+    plot(
+      1, 1,
+      main = paste("Carte :", input$map_variable,
+                   "-", input$map_year,
+                   "-", month.name[input$map_month])
+    )
   })
   
-  # rajout du boxplot
-  output$boxplot <- renderPlot({
-    x <- faithful[, input$var] 
-    boxplot(x, col = input$color, main = "Boxplot")
+  # 2. Graphique comparatif
+  output$graph_plot <- renderPlot({
+    plot(
+      1:10, rnorm(10),
+      type = "b", col = "pink",
+      main = paste("Analyse :", input$graph_variable),
+      xlab = "Exemple X", ylab = "Exemple Y"
+    )
   })
-  
-  # summary
-  output$summary <- renderPrint({
-    summary(faithful)
-  })
-  
-  # table
-  output$table <- renderDataTable({
-    faithful
-  })
-  
-  # nombre de classe
-  output$n_bins <- renderText({
-    paste("Nombre de classes : ", input$bins)
-  })
-  
-})
+}
+
