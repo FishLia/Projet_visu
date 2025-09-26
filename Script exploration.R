@@ -19,36 +19,29 @@ dep_01 <- dep_01_init %>%
 dep_01$date <- as.Date(paste(dep_01$year, dep_01$month, "01", sep = "-"))
 
 
-RR_by_year <- dep_01 %>% group_by(year) %>% 
-  summarise(moy = mean(RR)) %>% 
+RR_by_year <- dep_all %>% group_by(year) %>% 
+  summarise(moy = mean(RR, na.rm = T)) %>% 
   ggplot()+
   aes(x = year, y = moy) + 
   geom_line()
 
-NBJNEIG_by_year <- dep_01 %>% group_by(year) %>% 
-  summarise(NBJNEIG = sum(NBJNEIG)) %>% 
+RR_by_year
+
+NBJNEIG_by_year <- dep_all %>% group_by(year) %>% 
+  summarise(NBJNEIG = sum(NBJNEIG, na.rm = T)) %>% 
   ggplot()+
   aes(x = year, y = NBJNEIG) + 
-  geom_line()
+  geom_point()+
+  geom_smooth()
 
 NBJNEIG_by_year
 
-TM_by_year <- dep_01 %>% group_by(year) %>% 
-  summarise(TM_moy = mean(TM)) %>% 
+TM_by_year <- dep_all %>% group_by(year) %>% 
+  summarise(TM_moy = mean(TM, na.rm = T)) %>% 
   ggplot()+
   aes(x = year, y = TM_moy) + 
   geom_point()+
   geom_smooth()
 
 TM_by_year
-
-cor_mat <- cor(dep_01[,-c(3,15)])
-plot_corrmat <- ggcorrplot(cor_mat,lab = T, lab_size = 3)
-plot_corrmat
-
-dfcompleted <- missMDA::imputePCA(dep_01, ncp=2,quali.sup=c(3,15))$completeObs
-res.PCA<-PCA(dfcompleted,quali.sup=c(3,15),graph=FALSE)
-plot.PCA(res.PCA,choix='var',title="Graphe des variables de l'ACP")
-plot.PCA(res.PCA,invisible=c('quali','ind.sup'),habillage='year',title="Graphe des individus de l'ACP",label ='none')
-
 

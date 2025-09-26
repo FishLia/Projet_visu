@@ -4,6 +4,7 @@ library(dplyr)
 library(purrr)
 library(readr)  # plus sûr que read.table
 library(lubridate)
+library(maps)
 
 # Dossier où se trouvent tes fichiers
 data_path <- "C:/Users/augus/OneDrive/Documents/Cours/ACO/M2/Visualisation/Projet/very_recent_files/"
@@ -28,6 +29,7 @@ process_file <- function(file) {
   
   dep$date <- as.Date(paste(dep$year, dep$month, "01", sep = "-"))
   return(dep)
+  
 }
 
 # Appliquer la fonction à tous les fichiers et stocker les résultats dans une liste
@@ -39,8 +41,23 @@ names(dep_list) <- gsub("^.*MENS_departement_|_periode.*$", "", files)
 # Option 2 : combiner tous les départements dans un seul data.frame
 dep_all <- bind_rows(dep_list, .id = "departement")
 
+# dep_old <- dep_all
 # dep_recent <- dep_all
 # dep_very_recent <- dep_all
-# dep_old <- dep_all
+
 
 dep_all <- bind_rows(dep_old, dep_recent, dep_very_recent)
+
+
+france <- map_data("france")
+france$region <- as.factor(france$region)
+lab_f <- levels(france$region)
+dep_all$departement <- as.integer(dep_all$departement)
+lab_m <- levels(dep_all$departement)
+
+li <- data.frame(nom = lab_f,
+                     group = 1:96)
+
+dep_all <- rename(dep_all, "group" = "departement")
+dep_all <- dep_all %>% left_join(li, by = "group")
+dep_all <- rename(dep_all, "region" = "nom")
